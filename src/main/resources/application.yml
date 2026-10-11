@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: agendamento-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/agendamento}
+    username: ${DB_USER:agendamento}
+    password: ${DB_PASSWORD:agendamento}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+app:
+  # Fuso do estabelecimento: horários são guardados e exibidos nesse fuso.
+  timezone: ${APP_TIMEZONE:America/Sao_Paulo}
+  booking:
+    min-advance: 30m
+    max-advance-days: 60
+    cancel-deadline: 2h
+    slot-step: 15m
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
