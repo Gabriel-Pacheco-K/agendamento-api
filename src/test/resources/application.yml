@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:agendamento;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;LOCK_TIMEOUT=10000
+    username: sa
+    password:
+    hikari:
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+app:
+  timezone: America/Sao_Paulo
+  booking:
+    min-advance: 30m
+    max-advance-days: 60
+    cancel-deadline: 2h
+    slot-step: 15m
