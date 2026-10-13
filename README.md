@@ -8,6 +8,10 @@
 
 API REST de agendamento para salões, barbearias, clínicas e consultórios. Cadastra profissionais com o seu expediente e os serviços oferecidos, calcula os **horários livres** e **impede que o mesmo horário seja reservado duas vezes**, mesmo quando várias pessoas tentam reservar ao mesmo tempo.
 
+![Demonstração: horários livres, agendamento, conflito 409 e 10 pedidos simultâneos com só 1 aceito](docs/demo.gif)
+
+*Gravado com a API e o PostgreSQL rodando de verdade.*
+
 ---
 
 ## 🎯 O problema central: reservas simultâneas
