@@ -2,6 +2,7 @@ package com.gabrielpacheco.agendamento.controller;
 
 import com.gabrielpacheco.agendamento.dto.Dtos.AppointmentRequest;
 import com.gabrielpacheco.agendamento.dto.Dtos.AppointmentResponse;
+import com.gabrielpacheco.agendamento.dto.Dtos.DailyRevenue;
 import com.gabrielpacheco.agendamento.dto.Dtos.CancelRequest;
 import com.gabrielpacheco.agendamento.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +46,13 @@ public class AppointmentController {
     public List<AppointmentResponse> agenda(@RequestParam Long professionalId,
                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return appointmentService.agenda(professionalId, date);
+    }
+
+    @GetMapping("/revenue")
+    @Operation(summary = "Faturamento por dia (só concluídos), de todos os profissionais, até 366 dias")
+    public List<DailyRevenue> revenue(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return appointmentService.revenue(from, to);
     }
 
     @GetMapping("/{id}")

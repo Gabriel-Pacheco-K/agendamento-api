@@ -8,9 +8,14 @@ import java.util.Set;
  * aqui, em um único lugar, em vez de espalhadas em vários if/else.
  *
  * <pre>
- * SCHEDULED ──▶ CONFIRMED ──▶ COMPLETED
- *     │             │    └──▶ NO_SHOW
- *     └─────────────┴──▶ CANCELLED
+ * SCHEDULED ──▶ CONFIRMED
+ *     │             │
+ *     └──────┬──────┘
+ *            ├──▶ COMPLETED
+ *            ├──▶ NO_SHOW
+ *            └──▶ CANCELLED
+ *
+ * Confirmar é opcional: quem marcou pelo WhatsApp e apareceu pode ir direto para concluído.
  * </pre>
  */
 public enum AppointmentStatus {
@@ -25,7 +30,7 @@ public enum AppointmentStatus {
 
     public boolean canChangeTo(AppointmentStatus target) {
         return switch (this) {
-            case SCHEDULED -> target == CONFIRMED || target == CANCELLED;
+            case SCHEDULED -> target != SCHEDULED;
             case CONFIRMED -> target == COMPLETED || target == NO_SHOW || target == CANCELLED;
             case COMPLETED, CANCELLED, NO_SHOW -> false;
         };

@@ -41,12 +41,18 @@ Cliente B: grava a reserva                           ← duas pessoas no mesmo h
 - **Ciclo de vida do agendamento**, como uma máquina de estados:
 
 ```
-SCHEDULED ──▶ CONFIRMED ──▶ COMPLETED
-    │             │    └──▶ NO_SHOW
-    └─────────────┴──▶ CANCELLED
+SCHEDULED ──▶ CONFIRMED
+    │             │
+    └──────┬──────┘
+           ├──▶ COMPLETED
+           ├──▶ NO_SHOW
+           └──▶ CANCELLED
 ```
 
+Confirmar é opcional: quem marcou e apareceu pode ir direto para concluído.
+
 - **Regras configuráveis** no `application.yml`, sem mudar código: antecedência mínima, prazo de cancelamento, intervalo entre horários e limite de dias à frente
+- **Faturamento por dia** (`GET /api/appointments/revenue?from=&to=`), só com os atendimentos concluídos, para o painel do dono
 - **Erros no padrão RFC 7807** (Problem Details) e documentação interativa no Swagger
 
 ## 🛠️ Tecnologias

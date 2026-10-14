@@ -82,6 +82,10 @@ public final class Dtos {
             @NotBlank @Pattern(regexp = "^\\+?[0-9 ()-]{8,20}$", message = "telefone inválido") String customerPhone) {
     }
 
+    /** Faturamento de um dia: só os atendimentos concluídos contam. */
+    public record DailyRevenue(LocalDate date, long completed, BigDecimal revenue) {
+    }
+
     public record CancelRequest(@Size(max = 255) String reason) {
     }
 

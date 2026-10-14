@@ -67,18 +67,13 @@ class AppointmentServiceTest {
     }
 
     @Test
-    void completesOnlyAfterStartAndAfterConfirmation() {
+    void completesOnlyAfterStartEvenWithoutConfirmation() {
         Appointment appointment = appointment();
 
         assertThatThrownBy(() -> serviceAt(START.minusMinutes(1)).complete(1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("ainda não começou");
 
-        assertThatThrownBy(() -> serviceAt(START.plusMinutes(10)).complete(1L))
-                .as("precisa estar confirmado antes")
-                .isInstanceOf(BusinessException.class);
-
-        serviceAt(START.minusDays(1)).confirm(1L);
         serviceAt(START.plusMinutes(10)).complete(1L);
         assertThat(appointment.getStatus()).isEqualTo(AppointmentStatus.COMPLETED);
     }

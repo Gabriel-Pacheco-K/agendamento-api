@@ -148,6 +148,30 @@ class AgendamentoIntegrationTest {
     }
 
     @Test
+    void revenueCountsOnlyCompletedAppointmentsPerDay() throws Exception {
+        long done = id(book("10:00"));
+        id(book("11:00"));
+        var appointment = appointmentRepository.findById(done).orElseThrow();
+        appointment.changeStatus(com.gabrielpacheco.agendamento.domain.AppointmentStatus.COMPLETED);
+        appointmentRepository.save(appointment);
+
+        mvc.perform(get("/api/appointments/revenue").param("from", NEXT_MONDAY.minusDays(3).toString())
+                        .param("to", NEXT_MONDAY.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].date").value(NEXT_MONDAY.toString()))
+                .andExpect(jsonPath("$[0].completed").value(1))
+                .andExpect(jsonPath("$[0].revenue").value(45.0));
+
+        mvc.perform(get("/api/appointments/revenue").param("from", NEXT_MONDAY.toString())
+                        .param("to", NEXT_MONDAY.minusDays(1).toString()))
+                .andExpect(status().isUnprocessableEntity());
+        mvc.perform(get("/api/appointments/revenue").param("from", NEXT_MONDAY.toString())
+                        .param("to", NEXT_MONDAY.plusDays(366).toString()))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
     void invalidInputIsRejected() throws Exception {
         Map<String, Object> bad = new java.util.HashMap<>(Map.of(
                 "professionalId", professionalId, "serviceId", haircutId,

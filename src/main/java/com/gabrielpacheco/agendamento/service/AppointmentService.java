@@ -7,6 +7,7 @@ import com.gabrielpacheco.agendamento.domain.Professional;
 import com.gabrielpacheco.agendamento.domain.ServiceType;
 import com.gabrielpacheco.agendamento.dto.Dtos.AppointmentRequest;
 import com.gabrielpacheco.agendamento.dto.Dtos.AppointmentResponse;
+import com.gabrielpacheco.agendamento.dto.Dtos.DailyRevenue;
 import com.gabrielpacheco.agendamento.exception.BusinessException;
 import com.gabrielpacheco.agendamento.exception.ConflictException;
 import com.gabrielpacheco.agendamento.exception.NotFoundException;
@@ -16,7 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
@@ -78,6 +84,27 @@ public class AppointmentService {
         return appointmentRepository.findInRange(professionalId, date.atStartOfDay(), date.plusDays(1).atStartOfDay(),
                         EnumSet.allOf(AppointmentStatus.class))
                 .stream().map(AppointmentResponse::from).toList();
+    }
+
+    /** Até um ano por consulta, o bastante para o gráfico do ano no painel do dono. */
+    static final int MAX_REVENUE_DAYS = 366;
+
+    @Transactional(readOnly = true)
+    public List<DailyRevenue> revenue(LocalDate from, LocalDate to) {
+        if (to.isBefore(from)) {
+            throw new BusinessException("A data final não pode ser antes da inicial.");
+        }
+        if (ChronoUnit.DAYS.between(from, to) >= MAX_REVENUE_DAYS) {
+            throw new BusinessException("O período pode ter no máximo " + MAX_REVENUE_DAYS + " dias.");
+        }
+        Map<LocalDate, List<Appointment>> byDay = appointmentRepository
+                .findCompletedStartingBetween(from.atStartOfDay(), to.plusDays(1).atStartOfDay()).stream()
+                .collect(Collectors.groupingBy(a -> a.getStartAt().toLocalDate(), TreeMap::new, Collectors.toList()));
+        return byDay.entrySet().stream()
+                .map(day -> new DailyRevenue(day.getKey(), day.getValue().size(), day.getValue().stream()
+                        .map(a -> a.getService().getPrice())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .toList();
     }
 
     @Transactional

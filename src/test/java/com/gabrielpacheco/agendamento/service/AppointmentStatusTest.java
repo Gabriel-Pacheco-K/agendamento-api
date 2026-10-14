@@ -12,8 +12,8 @@ class AppointmentStatusTest {
     @CsvSource({
             "SCHEDULED, CONFIRMED, true",
             "SCHEDULED, CANCELLED, true",
-            "SCHEDULED, COMPLETED, false",
-            "SCHEDULED, NO_SHOW,   false",
+            "SCHEDULED, COMPLETED, true",
+            "SCHEDULED, NO_SHOW,   true",
             "CONFIRMED, COMPLETED, true",
             "CONFIRMED, NO_SHOW,   true",
             "CONFIRMED, CANCELLED, true",

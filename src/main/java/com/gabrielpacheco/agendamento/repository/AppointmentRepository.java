@@ -39,4 +39,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                   @Param("start") LocalDateTime start,
                                   @Param("end") LocalDateTime end,
                                   @Param("statuses") Collection<AppointmentStatus> statuses);
+
+    @Query("""
+            select a from Appointment a
+            join fetch a.service
+            where a.startAt >= :start and a.startAt < :end
+              and a.status = com.gabrielpacheco.agendamento.domain.AppointmentStatus.COMPLETED
+            """)
+    List<Appointment> findCompletedStartingBetween(@Param("start") LocalDateTime start,
+                                                   @Param("end") LocalDateTime end);
 }
